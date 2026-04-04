@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="SegundaTaskPane.ExportControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300">
+
+    <Grid Background="#F5F5F5">
+        <StackPanel Margin="20">
+            <TextBlock Text="EXPORTAÇÃO" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,20"/>
+
+            <Button Content="Salvar como PDF" 
+                    Height="45" Margin="0,5"
+                    Background="#D83B01" Foreground="White"
+                    Click="BtnExportPdf_Click"/>
+
+            <TextBlock Text="v1.0 - PDF" FontSize="10" Foreground="#AAA" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

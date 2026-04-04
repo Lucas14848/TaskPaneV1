@@ -1,0 +1,17 @@
+C:\TaskPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.dll
+C:\TaskPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.pdb
+C:\TaskPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.tlb
+C:\TaskPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.sldworks.dll
+C:\TaskPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swconst.dll
+C:\TaskPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swpublished.dll
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.AssemblyReference.cache
+C:\TaskPane\SegundaTaskPane\obj\Debug\ExportControl.baml
+C:\TaskPane\SegundaTaskPane\obj\Debug\MainControl.baml
+C:\TaskPane\SegundaTaskPane\obj\Debug\ExportControl.g.cs
+C:\TaskPane\SegundaTaskPane\obj\Debug\MainControl.g.cs
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane_MarkupCompile.cache
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.g.resources
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.CoreCompileInputs.cache
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaT.8415BC42.Up2Date
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.dll
+C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.pdb
