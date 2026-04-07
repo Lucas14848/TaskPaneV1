@@ -7,7 +7,7 @@ using SolidWorks.Interop.swpublished;
 
 namespace SegundaTaskPane
 {
-    [Guid("3763A3C0-3471-4CC8-AB3A-E55BBAAADC1F"), ComVisible(true)]
+    [Guid("F1B655D0-3D64-4C22-8A8D-D8507A116830"), ComVisible(true)]
     public class SolidWorksAddin : ISwAddin
     {
 

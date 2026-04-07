@@ -15,7 +15,7 @@
                     Background="#D83B01" Foreground="White"
                     Click="BtnExportPdf_Click"/>
 
-            <TextBlock Text="v1.0 - PDF" FontSize="10" Foreground="#AAA" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            <TextBlock Text="v1.1 - PDF" FontSize="10" Foreground="#AAA" HorizontalAlignment="Center" Margin="0,20,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

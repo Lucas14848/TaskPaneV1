@@ -1,0 +1,11 @@
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\TesteConsoleApp.exe.config
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\TesteConsoleApp.exe
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\TesteConsoleApp.pdb
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\SolidWorks.Interop.sldworks.dll
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\SolidWorks.Interop.swconst.dll
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\bin\Debug\SolidWorks.Interop.swpublished.dll
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\obj\Debug\TesteConsoleApp.csproj.AssemblyReference.cache
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\obj\Debug\TesteConsoleApp.csproj.CoreCompileInputs.cache
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\obj\Debug\TesteCon.60212C3F.Up2Date
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\obj\Debug\TesteConsoleApp.exe
+C:\TaskPane\TesteConsoleApp\TesteConsoleApp\obj\Debug\TesteConsoleApp.pdb

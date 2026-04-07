@@ -8,9 +8,9 @@
 
     <UserControl.Resources>
         <Style x:Key="TechButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Background" Value="#2D2D31"/>
             <Setter Property="Foreground" Value="#0078D4"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="45"/>
             <Setter Property="Margin" Value="0,5"/>
