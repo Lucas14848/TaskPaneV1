@@ -4,18 +4,98 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="1200" d:DesignWidth="300">
 
-    <Grid Background="#F5F5F5">
-        <StackPanel Margin="20">
-            <TextBlock Text="EXPORTAÇÃO" FontSize="18" FontWeight="Bold" Foreground="#333" Margin="0,0,0,20"/>
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BgColor" Color="#121212"/>
+        <SolidColorBrush x:Key="CardColor" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="MainColor" Color="#00B4FF"/>
+        <SolidColorBrush x:Key="BtnBg" Color="#2A2A2A"/>
+        <SolidColorBrush x:Key="BtnText" Color="#EEE"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#333"/>
 
-            <Button Content="Salvar como PDF" 
-                    Height="45" Margin="0,5"
-                    Background="#D83B01" Foreground="White"
-                    Click="BtnExportPdf_Click"/>
+        <Style x:Key="MacroButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Background" Value="{DynamicResource BtnBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BtnText}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="10,0,0,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </UserControl.Resources>
 
-            <TextBlock Text="v1.1 - PDF" FontSize="10" Foreground="#AAA" HorizontalAlignment="Center" Margin="0,20,0,0"/>
-        </StackPanel>
+    <Grid Background="{DynamicResource BgColor}">
+        <Button x:Name="BtnTheme" Content="◐" VerticalAlignment="Top" HorizontalAlignment="Right" 
+                Width="25" Height="25" Margin="5" Background="Transparent" BorderThickness="0" 
+                Foreground="{DynamicResource MainColor}" Cursor="Hand" Click="BtnTheme_Click" Panel.ZIndex="10"/>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="12,35,12,12">
+
+                <Border x:Name="PropriedadesBorder" Background="{DynamicResource CardColor}" CornerRadius="6" 
+                        Padding="12" Margin="0,0,0,15" BorderBrush="{DynamicResource BorderColor}" 
+                        BorderThickness="1" Visibility="Collapsed">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="26"/>
+                                <RowDefinition Height="26"/>
+                                <RowDefinition Height="26"/>
+                                <RowDefinition Height="26"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Denominação" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtDenominacao" Text="---" Foreground="{DynamicResource MainColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="1" Text="Desenho" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtNumeroDesenho" Text="---" Foreground="{DynamicResource MainColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="2" Text="Material" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TxtMaterial" Text="---" Foreground="{DynamicResource MainColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                            <TextBlock Grid.Row="3" Text="Revisão" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TxtRevisao" Text="---" Foreground="{DynamicResource MainColor}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Right"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock x:Name="LblTituloMacros" Text="LISTA DE MACROS" Foreground="{DynamicResource MainColor}" FontWeight="Bold" Margin="0,5" FontSize="11"/>
+
+                <StackPanel x:Name="PanelMacrosMontagem" Visibility="Collapsed">
+                    <Button Content="01 - CRIAR 3 VISTAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro01_Click"/>
+                    <Button Content="03 - REVISÕES E CÓPIAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro03_Click"/>
+                    <Button Content="04 - SALVA PDFs MONTAGEM ERP" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro04_Click"/>
+                    <Button Content="06 - SOLDAGEM 3D" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro06_Click"/>
+                    <Button Content="07 - LISTA DE CHAPAS DXF QTY" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro07_Click"/>
+                    <Button Content="14 - NAVEGADOR CATÁLOGOS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro14_Click"/>
+                    <Button Content="15 - CRIA ESPESSURA CHAPA" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro15_Click"/>
+                    <Button Content="16 - CRIA CORES CHAPA" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro16_Click"/>
+                    <Button Content="18 - EXCEL IMPORTAÇÃO CIGAM" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro18_Click"/>
+                    <Button Content="22 - CRIAR/RENOMEAR MANGUEIRAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro22_Click"/>
+                    <Button Content="25 - VERIFICA REVISÕES" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro25_Click"/>
+                    <Button Content="26 - PACOTE PROPRIEDADES PEÇA" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro26_Click"/>
+                    <Button Content="40 - PÓS IMPORTADOR ENG" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro40_Click"/>
+                    <Button Content="41 - CRIAR REVISÃO WORD" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro41_Click"/>
+                    <Button Content="50 - CRIA CATÁLOGO PEÇAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro50_Click"/>
+                    <Button Content="55 - CADASTRA SELECIONADOS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro55_Click"/>
+                    <Button Content="17 - CRIA CAVIDADES DE ALIVIO" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro17_Click"/>
+                </StackPanel>
+
+                <StackPanel x:Name="PanelMacrosPeca" Visibility="Collapsed">
+                    <Button Content="01 - CRIAR 3 VISTAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro01_Click"/>
+                    <Button Content="03 - REVISÕES E CÓPIAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro03_Click"/>
+                    <Button Content="07 - LISTA DE CHAPAS DXF QTY" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro07_Click"/>
+                    <Button Content="15 - CRIA ESPESSURA CHAPA" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro15_Click"/>
+                    <Button Content="26 - PACOTE PROPRIEDADES PEÇA" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro26_Click"/>
+                    <Button Content="41 - CRIAR REVISÃO WORD" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro41_Click"/>
+                    <Button Content="17 - CRIA CAVIDADES DE ALIVIO" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro17_Click"/>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

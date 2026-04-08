@@ -4,13 +4,13 @@ using System.Windows.Forms.Integration;
 using Microsoft.Win32;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swpublished;
+using SolidWorks.Interop.swconst;
 
 namespace SegundaTaskPane
 {
-    [Guid("F1B655D0-3D64-4C22-8A8D-D8507A116830"), ComVisible(true)]
+    [Guid("C4E6A446-2943-45C8-9692-78D9902ED097"), ComVisible(true)]
     public class SolidWorksAddin : ISwAddin
     {
-
         private ISldWorks _swApp;
         private int _cookie;
         private TaskpaneView _taskPane1;

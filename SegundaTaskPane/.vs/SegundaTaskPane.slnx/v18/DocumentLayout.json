@@ -1,18 +1,22 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\TaskPane\\SegundaTaskPane\\",
+  "WorkspaceRootPath": "C:\\1_TaksPane\\SegundaTaskPane\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|c:\\taskpane\\segundataskpane\\solidworksaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:solidworksaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|c:\\1_takspane\\segundataskpane\\maincontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:maincontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|C:\\TaskPane\\SegundaTaskPane\\exportcontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|c:\\1_takspane\\segundataskpane\\exportcontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:exportcontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|c:\\1_takspane\\segundataskpane\\exportcontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:exportcontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|C:\\TaskPane\\SegundaTaskPane\\maincontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:maincontrol.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|c:\\1_takspane\\segundataskpane\\solidworksaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4315C7AD-80FF-4622-A976-CEF6297B79D7}|SegundaTaskPane.csproj|solutionrelative:solidworksaddin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,41 +26,56 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "ExportControl.xaml",
-              "DocumentMoniker": "C:\\TaskPane\\SegundaTaskPane\\ExportControl.xaml",
+              "DocumentMoniker": "C:\\1_TaksPane\\SegundaTaskPane\\ExportControl.xaml",
               "RelativeDocumentMoniker": "ExportControl.xaml",
-              "ToolTip": "C:\\TaskPane\\SegundaTaskPane\\ExportControl.xaml",
+              "ToolTip": "C:\\1_TaksPane\\SegundaTaskPane\\ExportControl.xaml",
               "RelativeToolTip": "ExportControl.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-07T01:45:59.204Z"
+              "WhenOpened": "2026-04-08T16:02:58.486Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MainControl.xaml",
-              "DocumentMoniker": "C:\\TaskPane\\SegundaTaskPane\\MainControl.xaml",
-              "RelativeDocumentMoniker": "MainControl.xaml",
-              "ToolTip": "C:\\TaskPane\\SegundaTaskPane\\MainControl.xaml",
-              "RelativeToolTip": "MainControl.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2026-04-07T01:45:57.484Z"
+              "DocumentIndex": 3,
+              "Title": "SolidWorksAddin.cs",
+              "DocumentMoniker": "C:\\1_TaksPane\\SegundaTaskPane\\SolidWorksAddin.cs",
+              "RelativeDocumentMoniker": "SolidWorksAddin.cs",
+              "ToolTip": "C:\\1_TaksPane\\SegundaTaskPane\\SolidWorksAddin.cs",
+              "RelativeToolTip": "SolidWorksAddin.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-08T15:56:47.899Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExportControl.xaml.cs",
+              "DocumentMoniker": "C:\\1_TaksPane\\SegundaTaskPane\\ExportControl.xaml.cs",
+              "RelativeDocumentMoniker": "ExportControl.xaml.cs",
+              "ToolTip": "C:\\1_TaksPane\\SegundaTaskPane\\ExportControl.xaml.cs",
+              "RelativeToolTip": "ExportControl.xaml.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAowCYAAABNAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-08T15:55:38.766Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SolidWorksAddin.cs",
-              "DocumentMoniker": "C:\\TaskPane\\SegundaTaskPane\\SolidWorksAddin.cs",
-              "RelativeDocumentMoniker": "SolidWorksAddin.cs",
-              "ToolTip": "C:\\TaskPane\\SegundaTaskPane\\SolidWorksAddin.cs",
-              "RelativeToolTip": "SolidWorksAddin.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-07T01:44:42.975Z",
+              "Title": "MainControl.xaml",
+              "DocumentMoniker": "C:\\1_TaksPane\\SegundaTaskPane\\MainControl.xaml",
+              "RelativeDocumentMoniker": "MainControl.xaml",
+              "ToolTip": "C:\\1_TaksPane\\SegundaTaskPane\\MainControl.xaml",
+              "RelativeToolTip": "MainControl.xaml",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-08T15:55:38.221Z",
               "EditorCaption": ""
             }
           ]
