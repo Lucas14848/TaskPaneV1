@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
+using System.Windows.Interop;
 using Microsoft.Win32;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -21,6 +22,10 @@ namespace SegundaTaskPane
         private bool _hasPendingChanges = false;
         private string _currentDocKey = null;
         private ModelDoc2 _lastModelRef = null;
+        private string _currentTemplate = "";
+        private IntPtr _hwndSource = IntPtr.Zero;
+        private HwndSource _source;
+        private HwndSourceHook _hook;
 
         public ISldWorks SwApp
         {
@@ -43,6 +48,7 @@ namespace SegundaTaskPane
             InitializeComponent();
             CarregarConfiguracoes();
             this.Loaded += (s, e) => AtualizarInterface();
+            this.Loaded += (s, e) => CacheHwnd();
         }
 
         private int OnDocChange()
@@ -54,26 +60,37 @@ namespace SegundaTaskPane
 
                 if (_hasPendingChanges && _currentDocKey != null && newKey != _currentDocKey && _lastModelRef != null)
                 {
-                    var result = MessageBox.Show("Salvar alterações das propriedades antes de trocar de peça/desenho?",
+                    /*var result = MessageBox.Show("Salvar alterações das propriedades antes de trocar de peça/desenho?",
                                                  "Salvar propriedades",
                                                  MessageBoxButton.YesNo,
                                                  MessageBoxImage.Question);
+                    
                     if (result == MessageBoxResult.Yes)
                     {
                         SalvarCamposDigitados(_lastModelRef);
-                        _hasPendingChanges = false;
                     }
+                    */
+                    // Mesmo que escolha não salvar, não perguntar novamente para esta troca
+                    _hasPendingChanges = false;
                 }
 
-                if (SwApp == null || newModel == null)
-                {
-                    LimparCampos();
-                    PropriedadesBorder.Visibility = Visibility.Collapsed;
-                    PanelMacrosPeca.Visibility = Visibility.Collapsed;
-                    PanelMacrosMontagem.Visibility = Visibility.Collapsed;
-                    PanelMacrosDesenho.Visibility = Visibility.Collapsed;
-                    return;
-                }
+            if (SwApp == null || newModel == null)
+            {
+                LimparCampos();
+                PropriedadesBorder.Visibility = Visibility.Collapsed;
+                PanelMacrosPeca.Visibility = Visibility.Collapsed;
+                PanelMacrosMontagem.Visibility = Visibility.Collapsed;
+                PanelMacrosDesenho.Visibility = Visibility.Collapsed;
+                _currentDocKey = null;
+                _lastModelRef = null;
+                _currentTemplate = "";
+                _hasPendingChanges = false;
+                return;
+            }
+
+                // Atualiza doc de referência antes de repintar para evitar prompts duplicados em eventos consecutivos
+                _currentDocKey = newKey;
+                _lastModelRef = newModel;
 
                 AtualizarInterface();
             }));
@@ -97,6 +114,7 @@ namespace SegundaTaskPane
                 _currentDocKey = null;
                 _lastModelRef = null;
                 _hasPendingChanges = false;
+                _currentTemplate = "";
                 return;
             }
 
@@ -106,6 +124,7 @@ namespace SegundaTaskPane
 
             _currentDocKey = GetDocKey(swModel);
             _lastModelRef = swModel;
+            _currentTemplate = swModel.Extension.get_CustomPropertyBuilderTemplate(false);
 
             if (isModel)
             {
@@ -137,8 +156,7 @@ namespace SegundaTaskPane
             _isLoadingProps = true;
             try
             {
-                string pathTemplate = swModel.Extension.get_CustomPropertyBuilderTemplate(false);
-                string template = !string.IsNullOrEmpty(pathTemplate) ? Path.GetFileName(pathTemplate).ToLower() : "";
+                string template = !string.IsNullOrEmpty(_currentTemplate) ? Path.GetFileName(_currentTemplate).ToLower() : "";
 
                 // Dados Principais
                 TxtNomProjeto.Text = GetProp(swModel, "Nom.Projeto");
@@ -187,6 +205,16 @@ namespace SegundaTaskPane
             _hasPendingChanges = true;
         }
 
+        private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            EnsureKeyboardFocus(sender as TextBox);
+        }
+
+        private void TextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            EnsureKeyboardFocus(sender as TextBox);
+        }
+
         // EVENTO PARA SALVAR AUTOMATICAMENTE AO EDITAR O TEXTO
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
@@ -199,9 +227,8 @@ namespace SegundaTaskPane
 
             string propName = tb.Tag.ToString();
             string newValue = tb.Text;
-
-            CustomPropertyManager propMgr = swModel.Extension.get_CustomPropertyManager("");
-            propMgr.Add3(propName, (int)swCustomInfoType_e.swCustomInfoText, newValue, (int)swCustomPropertyAddOption_e.swCustomPropertyReplaceValue);
+            string template = !string.IsNullOrEmpty(_currentTemplate) ? Path.GetFileName(_currentTemplate).ToLower() : "";
+            SetProp(swModel, propName, newValue, template);
         }
 
         private string ObterValorPorTemplate(ModelDoc2 swModel, string prop, string template)
@@ -273,7 +300,15 @@ namespace SegundaTaskPane
         private void BtnMacro22_Click(object sender, RoutedEventArgs e) => ExecutarMacro("22-Criar e Renomear Mangueiras.swp");
         private void BtnMacro24_Click(object sender, RoutedEventArgs e) => ExecutarMacro("24-Link das Vistas a Lista de materiais.swp");
         private void BtnMacro25_Click(object sender, RoutedEventArgs e) => ExecutarMacro("25-Verifica Revisões de todas as peças da montagem.swp");
-        private void BtnMacro26_Click(object sender, RoutedEventArgs e) => ExecutarMacro("26-Pacote de preenchimento propriedades personalizadas na Peça.swp");
+        private void BtnMacro26_Click(object sender, RoutedEventArgs e) {
+            if (SwApp == null) return;
+            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
+            int type = swModel.GetType();
+            bool isSheetMetal = type == (int)swDocumentTypes_e.swDocPART && IsSheetMetal(swModel);
+            ExecutarMacro("26-Pacote de preenchimento propriedades personalizadas na Peça.swp");
+            CarregarPropriedades(swModel, isSheetMetal);
+        }
+
         private void BtnMacro40_Click(object sender, RoutedEventArgs e) => ExecutarMacro("40-Pós importador de Engenharia.swp");
         private void BtnMacro41_Click(object sender, RoutedEventArgs e) => ExecutarMacro("41-Criar Revisão WORD.swp");
         private void BtnMacro50_Click(object sender, RoutedEventArgs e) => ExecutarMacro("50 - Cria Catalogo de peças.swp");
@@ -311,8 +346,6 @@ namespace SegundaTaskPane
 
         private void SalvarCamposDigitados(ModelDoc2 swModel)
         {
-            CustomPropertyManager propMgr = swModel.Extension.get_CustomPropertyManager("");
-
             TextBox[] campos =
             {
                 TxtNomProjeto, TxtCodProjeto, TxtDenominacao, TxtNumeroDesenho, TxtCodigo, TxtRevisao,
@@ -322,7 +355,9 @@ namespace SegundaTaskPane
             foreach (var tb in campos)
             {
                 if (tb?.Tag == null || tb.IsReadOnly) continue;
-                propMgr.Add3(tb.Tag.ToString(), (int)swCustomInfoType_e.swCustomInfoText, tb.Text, (int)swCustomPropertyAddOption_e.swCustomPropertyReplaceValue);
+                string propName = tb.Tag.ToString();
+                string template = !string.IsNullOrEmpty(_currentTemplate) ? Path.GetFileName(_currentTemplate).ToLower() : "";
+                SetProp(swModel, propName, tb.Text, template);
             }
         }
 
@@ -332,6 +367,70 @@ namespace SegundaTaskPane
             string path = model.GetPathName();
             if (!string.IsNullOrWhiteSpace(path)) return path.ToLowerInvariant();
             return $"{model.GetTitle()}_{model.GetType()}".ToLowerInvariant();
+        }
+
+        private void SetProp(ModelDoc2 swModel, string propName, string value, string template)
+        {
+            bool isConfig = false;
+            if (propName == "Número Desenho" && template == "propriedade de peca nova.prtprp") isConfig = true;
+            else if (propName == "Código")
+            {
+                string[] targets = { "05 - catalogo ns", "propriedade de montagem.asmprp", "propriedade de peça nova.prtprp", "propriedade de peça.prtprp" };
+                if (targets.Any(t => template.Contains(t))) isConfig = true;
+            }
+
+            CustomPropertyManager mgr = isConfig
+                ? ((Configuration)swModel.GetActiveConfiguration()).CustomPropertyManager
+                : swModel.Extension.get_CustomPropertyManager("");
+
+            mgr.Add3(propName, (int)swCustomInfoType_e.swCustomInfoText, value, (int)swCustomPropertyAddOption_e.swCustomPropertyReplaceValue);
+        }
+
+        private void CacheHwnd()
+        {
+            _source = (HwndSource)PresentationSource.FromVisual(this);
+            _hwndSource = _source?.Handle ?? IntPtr.Zero;
+
+            if (_source != null && _hook == null)
+            {
+                _hook = new HwndSourceHook(WndProc);
+                _source.AddHook(_hook);
+            }
+        }
+
+        private void EnsureKeyboardFocus(TextBox tb)
+        {
+            if (tb == null) return;
+
+            if (_hwndSource == IntPtr.Zero)
+                CacheHwnd();
+
+            if (_hwndSource != IntPtr.Zero)
+            {
+                NativeMethods.SetFocus(_hwndSource);
+            }
+
+            if (!tb.IsKeyboardFocused)
+            {
+                tb.Focus();
+                Keyboard.Focus(tb);
+            }
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            const int WM_GETDLGCODE = 0x0087;
+
+            if (msg == WM_GETDLGCODE)
+            {
+                const int DLGC_WANTALLCHARS = 0x0004;
+                const int DLGC_WANTARROWS = 0x0001;
+                const int DLGC_WANTTAB = 0x0002;
+                handled = true;
+                return new IntPtr(DLGC_WANTALLCHARS | DLGC_WANTARROWS | DLGC_WANTTAB);
+            }
+
+            return IntPtr.Zero;
         }
 
         private bool IsSheetMetal(ModelDoc2 model)
@@ -400,5 +499,11 @@ namespace SegundaTaskPane
             TxtProjetista.Text = TxtDataProjeto.Text = TxtPeso.Text = "---";
             TxtAprov.Text = TxtDatAprov.Text = TxtObs.Text = TxtMaterial.Text = TxtEspessura.Text = TxtCatalogo.Text = "---";
         }
+    }
+
+    internal static class NativeMethods
+    {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        internal static extern IntPtr SetFocus(IntPtr hWnd);
     }
 }

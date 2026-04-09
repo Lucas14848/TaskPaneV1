@@ -26,6 +26,8 @@
             <Setter Property="IsReadOnly" Value="False"/>
             <EventSetter Event="LostFocus" Handler="TextBox_LostFocus"/>
             <EventSetter Event="TextChanged" Handler="TextBox_TextChanged"/>
+            <EventSetter Event="GotKeyboardFocus" Handler="TextBox_GotKeyboardFocus"/>
+            <EventSetter Event="PreviewMouseDown" Handler="TextBox_PreviewMouseDown"/>
         </Style>
 
         <Style x:Key="MacroButtonStyle" TargetType="Button">
@@ -70,7 +72,7 @@
                         </DockPanel>
                         <DockPanel Margin="0,2">
                             <TextBlock Text="Cód. Proj." FontSize="11" Foreground="{DynamicResource MainColor}"/>
-                            <TextBox x:Name="TxtCodProjeto" Style="{StaticResource EditValueStyle}" Tag="Código do Projeto"/>
+                            <TextBox x:Name="TxtCodProjeto" Style="{StaticResource EditValueStyle}" Tag="Conjunto"/>
                         </DockPanel>
                         <DockPanel Margin="0,2">
                             <TextBlock Text="Denom." FontSize="11" Foreground="{DynamicResource MainColor}"/>
