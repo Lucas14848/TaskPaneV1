@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="1500" d:DesignWidth="300">
+             d:DesignHeight="1200" d:DesignWidth="300">
 
     <UserControl.Resources>
         <SolidColorBrush x:Key="BgColor" Color="#121212"/>
@@ -14,6 +14,20 @@
         <SolidColorBrush x:Key="BtnText" Color="#EEE"/>
         <SolidColorBrush x:Key="BorderColor" Color="#333"/>
 
+        <Style x:Key="EditValueStyle" TargetType="TextBox">
+            <Setter Property="Foreground" Value="{DynamicResource MainColor}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="IsReadOnly" Value="False"/>
+            <EventSetter Event="LostFocus" Handler="TextBox_LostFocus"/>
+            <EventSetter Event="TextChanged" Handler="TextBox_TextChanged"/>
+        </Style>
+
         <Style x:Key="MacroButtonStyle" TargetType="Button">
             <Setter Property="Margin" Value="0,1"/>
             <Setter Property="Height" Value="34"/>
@@ -22,131 +36,108 @@
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
             <Setter Property="FontSize" Value="10.5"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="2,0,0,0"/>
-            <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="2">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="&#xE71B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="5,0,8,0" Foreground="{DynamicResource MainColor}"/>
+                                <TextBlock Text="&#xE71B;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="6,0,10,0" Foreground="{DynamicResource MainColor}"/>
                                 <ContentPresenter VerticalAlignment="Center"/>
                             </StackPanel>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#005A9E"/>
-                                <Setter Property="Foreground" Value="White"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
-        <Style x:Key="ValueTextStyle" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource MainColor}"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="ToolTip" Value="Clique para copiar"/>
-        </Style>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource BgColor}">
-        <Button x:Name="BtnTheme" Content="◐" VerticalAlignment="Top" HorizontalAlignment="Right" 
-                Width="25" Height="25" Margin="5" Background="Transparent" BorderThickness="0" 
-                Foreground="{DynamicResource MainColor}" Cursor="Hand" Click="BtnTheme_Click" Panel.ZIndex="10"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="5,35,5,12">
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10,15,10,15">
 
                 <Border x:Name="PropriedadesBorder" Background="{DynamicResource CardColor}" CornerRadius="6" 
-                        Padding="8" Margin="0,0,0,15" BorderBrush="{DynamicResource BorderColor}" 
+                        Padding="10" Margin="0,0,0,15" BorderBrush="{DynamicResource BorderColor}" 
                         BorderThickness="1" Visibility="Collapsed">
                     <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="26"/>
-                                <RowDefinition Height="26"/>
-                                <RowDefinition Height="26"/>
-                                <RowDefinition Height="26"/>
-                                <RowDefinition Height="26"/>
-                            </Grid.RowDefinitions>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Nome Proj." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtNomProjeto" Style="{StaticResource EditValueStyle}" Tag="Nom.Projeto"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Cód. Proj." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtCodProjeto" Style="{StaticResource EditValueStyle}" Tag="Código do Projeto"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Denom." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtDenominacao" Style="{StaticResource EditValueStyle}" Tag="Denominação"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Nº Des." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtNumeroDesenho" Style="{StaticResource EditValueStyle}" Tag="Número Desenho"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Cód. Sist." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtCodigo" Style="{StaticResource EditValueStyle}" Tag="Código"/>
+                        </DockPanel>
+                        <DockPanel Margin="0,2">
+                            <TextBlock Text="Rev." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                            <TextBox x:Name="TxtRevisao" Style="{StaticResource EditValueStyle}" Tag="Rev."/>
+                        </DockPanel>
 
-                            <TextBlock Grid.Row="0" Text="Den." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtDenominacao" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
+                        <Button x:Name="BtnExpandir" Content="▼ MAIS DETALHES" Margin="0,8,0,0" Height="22" Background="Transparent" Foreground="{DynamicResource MainColor}" FontSize="10" BorderThickness="0" Click="BtnExpandir_Click"/>
 
-                            <TextBlock Grid.Row="1" Text="Des." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtNumeroDesenho" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                            <TextBlock Grid.Row="2" Text="Cód." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TxtCodigo" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                            <TextBlock Grid.Row="3" Text="Mat." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TxtMaterial" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                            <TextBlock Grid.Row="4" Text="Rev." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="TxtRevisao" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-                        </Grid>
-
-                        <Button x:Name="BtnExpandir" Content="▼ MAIS DETALHES" Margin="0,10,0,0" Height="22" Background="Transparent" Foreground="{DynamicResource MainColor}" FontSize="10" BorderThickness="0" Click="BtnExpandir_Click"/>
-
-                        <StackPanel x:Name="GridExpandido" Visibility="Collapsed" Margin="0,10,0,0">
+                        <StackPanel x:Name="GridExpandido" Visibility="Collapsed" Margin="0,5,0,0">
                             <Separator Background="{DynamicResource BorderColor}" Margin="0,5,0,10"/>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                    <RowDefinition Height="26"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Projetista" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtProjetista" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
 
-                                <TextBlock Grid.Row="1" Text="Data" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtDataProjeto" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="Projetista" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtProjetista" Style="{StaticResource EditValueStyle}" Tag="Projetista"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="Data Proj." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtDataProjeto" Style="{StaticResource EditValueStyle}" Tag="Data do Projeto"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="Aprovador" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtAprov" Style="{StaticResource EditValueStyle}" Tag="Aprov."/>
+                            </DockPanel>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="Data Apr." FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtDatAprov" Style="{StaticResource EditValueStyle}" Tag="Dat.Aprov."/>
+                            </DockPanel>
 
-                                <TextBlock Grid.Row="2" Text="Espessura" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TxtEspessura" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
+                            <DockPanel x:Name="RowMaterial" Margin="0,2">
+                                <TextBlock Text="Material" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtMaterial" Style="{StaticResource EditValueStyle}" Tag="Material"/>
+                            </DockPanel>
+                            <DockPanel x:Name="RowEspessura" Margin="0,2">
+                                <TextBlock Text="Espessura" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtEspessura" Style="{StaticResource EditValueStyle}" Tag="Espessura"/>
+                            </DockPanel>
+                            <DockPanel x:Name="RowCatalogo" Margin="0,2">
+                                <TextBlock Text="Catálogo" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtCatalogo" Style="{StaticResource EditValueStyle}" Tag="Catálogo"/>
+                            </DockPanel>
 
-                                <TextBlock Grid.Row="3" Text="Peso" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TxtPeso" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
+                            <DockPanel Margin="0,2">
+                                <TextBlock Text="Peso (kg)" FontSize="11" Foreground="{DynamicResource MainColor}"/>
+                                <TextBox x:Name="TxtPeso" Style="{StaticResource EditValueStyle}" IsReadOnly="True" Opacity="0.6"/>
+                            </DockPanel>
 
-                                <TextBlock Grid.Row="4" Text="Nom.Proj" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="TxtNomProjeto" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                                <TextBlock Grid.Row="5" Text="Conjunto" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="5" Grid.Column="1" x:Name="TxtConjunto" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                                <TextBlock Grid.Row="6" Text="Aprov." FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="6" Grid.Column="1" x:Name="TxtAprov" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                                <TextBlock Grid.Row="7" Text="Dat.Apr" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="7" Grid.Column="1" x:Name="TxtDatAprov" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click"/>
-
-                                <TextBlock Grid.Row="8" Text="Obs" FontSize="11" Foreground="{DynamicResource MainColor}" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Row="8" Grid.Column="1" x:Name="TxtObs" Text="---" Style="{StaticResource ValueTextStyle}" MouseLeftButtonDown="CopyText_Click" TextTrimming="CharacterEllipsis"/>
-                            </Grid>
+                            <StackPanel Margin="0,5,0,0">
+                                <TextBlock Text="Observação:" FontSize="11" Foreground="{DynamicResource MainColor}" Margin="0,0,0,4"/>
+                                <TextBox x:Name="TxtObs" Style="{StaticResource EditValueStyle}" Tag="Obs." TextAlignment="Left" TextWrapping="Wrap" AcceptsReturn="True" Height="Auto" MinHeight="40"/>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <TextBlock x:Name="LblTituloMacros" Text="MACROS" Foreground="{DynamicResource MainColor}" FontWeight="Bold" Margin="2,5" FontSize="10"/>
+                <TextBlock x:Name="LblTituloMacros" Text="MACROS" Foreground="{DynamicResource MainColor}" FontWeight="Bold" Margin="2,5,0,8" FontSize="10"/>
 
                 <StackPanel x:Name="PanelMacrosMontagem" Visibility="Collapsed">
                     <Button Content="01 - CRIAR 3 VISTAS" Style="{StaticResource MacroButtonStyle}" Click="BtnMacro01_Click"/>
@@ -187,5 +178,32 @@
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
+
+        <Border Grid.Row="1" Background="{DynamicResource CardColor}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,1,0,0" Padding="5">
+            <StackPanel Orientation="Vertical">
+                <Button x:Name="BtnSalvarProps" Content="SALVAR AGORA" Height="22" Width="110" HorizontalAlignment="Left"
+                        Background="{DynamicResource BtnBg}" Foreground="{DynamicResource MainColor}"
+                        BorderThickness="1" BorderBrush="{DynamicResource BorderColor}"
+                        FontWeight="Bold" FontSize="9" Margin="0,0,0,4" Click="BtnSalvarProps_Click" Cursor="Hand"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" >
+                    <Button x:Name="BtnAtualizarProps" Content="ATUALIZAR PROPS" Height="30" Width="Auto" Margin="0,0,5,0"
+                            Background="{DynamicResource BtnBg}" Foreground="{DynamicResource MainColor}"
+                            BorderThickness="1" BorderBrush="{DynamicResource BorderColor}"
+                            FontWeight="Bold" FontSize="11" Click="BtnAtualizarProps_Click" Cursor="Hand"/>
+
+                    <Button x:Name="BtnTheme" Content="ALTERAR TEMA ◐" Height="30" Width="Auto"
+                            Background="{DynamicResource BtnBg}" Foreground="{DynamicResource MainColor}" 
+                            BorderThickness="1" BorderBrush="{DynamicResource BorderColor}"
+                            FontWeight="Bold" FontSize="11" Click="BtnTheme_Click" Cursor="Hand">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="4"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

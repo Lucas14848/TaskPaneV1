@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Input;
+using Microsoft.Win32;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 
@@ -13,7 +15,12 @@ namespace SegundaTaskPane
     {
         private ISldWorks _swApp;
         private bool _isDarkTheme = true;
-        private string _macroPath = @"Y:\01 PRJ - PROJETO\Projetos\Solid Defaults\Macro SW";
+        private readonly string _macroPath = @"Y:\01 PRJ - PROJETO\Projetos\Solid Defaults\Macro SW";
+        private const string REG_KEY = @"Software\Potenza\SolidWorksAddin";
+        private bool _isLoadingProps = false;
+        private bool _hasPendingChanges = false;
+        private string _currentDocKey = null;
+        private ModelDoc2 _lastModelRef = null;
 
         public ISldWorks SwApp
         {
@@ -34,10 +41,44 @@ namespace SegundaTaskPane
         public ExportControl()
         {
             InitializeComponent();
+            CarregarConfiguracoes();
             this.Loaded += (s, e) => AtualizarInterface();
         }
 
-        private int OnDocChange() { Dispatcher.BeginInvoke(new Action(() => AtualizarInterface())); return 0; }
+        private int OnDocChange()
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ModelDoc2 newModel = (ModelDoc2)SwApp?.ActiveDoc;
+                string newKey = GetDocKey(newModel);
+
+                if (_hasPendingChanges && _currentDocKey != null && newKey != _currentDocKey && _lastModelRef != null)
+                {
+                    var result = MessageBox.Show("Salvar alterações das propriedades antes de trocar de peça/desenho?",
+                                                 "Salvar propriedades",
+                                                 MessageBoxButton.YesNo,
+                                                 MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SalvarCamposDigitados(_lastModelRef);
+                        _hasPendingChanges = false;
+                    }
+                }
+
+                if (SwApp == null || newModel == null)
+                {
+                    LimparCampos();
+                    PropriedadesBorder.Visibility = Visibility.Collapsed;
+                    PanelMacrosPeca.Visibility = Visibility.Collapsed;
+                    PanelMacrosMontagem.Visibility = Visibility.Collapsed;
+                    PanelMacrosDesenho.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                AtualizarInterface();
+            }));
+            return 0;
+        }
         private int OnFileClose(string name, int reason) { Dispatcher.BeginInvoke(new Action(() => { LimparCampos(); AtualizarInterface(); })); return 0; }
 
         public void AtualizarInterface()
@@ -51,24 +92,37 @@ namespace SegundaTaskPane
             PanelMacrosMontagem.Visibility = Visibility.Collapsed;
             PanelMacrosDesenho.Visibility = Visibility.Collapsed;
 
-            if (swModel == null) return;
+            if (swModel == null)
+            {
+                _currentDocKey = null;
+                _lastModelRef = null;
+                _hasPendingChanges = false;
+                return;
+            }
 
             int type = swModel.GetType();
+            bool isModel = type == (int)swDocumentTypes_e.swDocASSEMBLY || type == (int)swDocumentTypes_e.swDocPART;
+            bool isSheetMetal = type == (int)swDocumentTypes_e.swDocPART && IsSheetMetal(swModel);
 
-            if (type == (int)swDocumentTypes_e.swDocASSEMBLY || type == (int)swDocumentTypes_e.swDocPART)
+            _currentDocKey = GetDocKey(swModel);
+            _lastModelRef = swModel;
+
+            if (isModel)
             {
                 PropriedadesBorder.Visibility = Visibility.Visible;
-                CarregarPropriedades(swModel);
+                CarregarPropriedades(swModel, isSheetMetal);
 
                 if (type == (int)swDocumentTypes_e.swDocASSEMBLY)
                 {
                     PanelMacrosMontagem.Visibility = Visibility.Visible;
                     LblTituloMacros.Text = "MACROS - MONTAGEM";
+                    AjustarVisibilidadeRows(false, false);
                 }
                 else
                 {
                     PanelMacrosPeca.Visibility = Visibility.Visible;
                     LblTituloMacros.Text = "MACROS - PEÇA";
+                    AjustarVisibilidadeRows(true, isSheetMetal);
                 }
             }
             else if (type == (int)swDocumentTypes_e.swDocDRAWING)
@@ -78,50 +132,120 @@ namespace SegundaTaskPane
             }
         }
 
-        private void CarregarPropriedades(ModelDoc2 swModel)
+        private void CarregarPropriedades(ModelDoc2 swModel, bool isSheetMetal)
         {
-            CustomPropertyManager propMgr = swModel.Extension.get_CustomPropertyManager("");
-            TxtDenominacao.Text = GetProp(propMgr, "Denominação");
-            TxtNumeroDesenho.Text = GetProp(propMgr, "Número Desenho");
-            TxtCodigo.Text = GetProp(propMgr, "Código");
-            TxtMaterial.Text = GetProp(propMgr, "Material");
-            TxtRevisao.Text = GetProp(propMgr, "Rev.");
-
-            TxtProjetista.Text = GetProp(propMgr, "Projetista");
-            TxtDataProjeto.Text = GetProp(propMgr, "Data do Projeto");
-            TxtEspessura.Text = GetProp(propMgr, "Espessura");
-            TxtPeso.Text = GetProp(propMgr, "Peso");
-            TxtNomProjeto.Text = GetProp(propMgr, "Nom.Projeto");
-            TxtConjunto.Text = GetProp(propMgr, "Conjunto");
-            TxtAprov.Text = GetProp(propMgr, "Aprov.");
-            TxtDatAprov.Text = GetProp(propMgr, "Dat.Aprov.");
-            TxtObs.Text = GetProp(propMgr, "Obs.");
-        }
-
-        private void CopyText_Click(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is TextBlock tb && tb.Text != "---")
+            _isLoadingProps = true;
+            try
             {
-                Clipboard.SetText(tb.Text);
-                // Opcional: Feedback visual rápido mudando a cor
-                var originalBrush = tb.Foreground;
-                tb.Foreground = Brushes.White;
-                System.Threading.Tasks.Task.Delay(200).ContinueWith(_ => Dispatcher.Invoke(() => tb.Foreground = originalBrush));
+                string pathTemplate = swModel.Extension.get_CustomPropertyBuilderTemplate(false);
+                string template = !string.IsNullOrEmpty(pathTemplate) ? Path.GetFileName(pathTemplate).ToLower() : "";
+
+                // Dados Principais
+                TxtNomProjeto.Text = GetProp(swModel, "Nom.Projeto");
+                TxtCodProjeto.Text = GetProp(swModel, "Conjunto");
+                TxtDenominacao.Text = GetProp(swModel, "Denominação");
+                TxtRevisao.Text = GetProp(swModel, "Rev.");
+
+                // Lógica de Template para Código e Número Desenho
+                TxtCodigo.Text = ObterValorPorTemplate(swModel, "Código", template);
+                TxtNumeroDesenho.Text = ObterValorPorTemplate(swModel, "Número Desenho", template);
+
+                // Detalhes Expandidos
+                TxtProjetista.Text = GetProp(swModel, "Projetista");
+                TxtDataProjeto.Text = GetProp(swModel, "Data do Projeto");
+                TxtAprov.Text = GetProp(swModel, "Aprov.");
+                TxtDatAprov.Text = GetProp(swModel, "Dat.Aprov.");
+                TxtMaterial.Text = GetProp(swModel, "Material");
+                TxtObs.Text = GetProp(swModel, "Obs.");
+
+                // Peso Físico (Calculado)
+                MassProperty massProps = swModel.Extension.CreateMassProperty();
+                TxtPeso.Text = massProps != null ? massProps.Mass.ToString("N3") : "0.000";
+
+                if (swModel.GetType() == (int)swDocumentTypes_e.swDocPART)
+                {
+                    TxtEspessura.Text = isSheetMetal ? GetProp(swModel, "Espessura") : "---";
+                    TxtCatalogo.Text = "---";
+                }
+                else
+                {
+                    TxtCatalogo.Text = GetProp(swModel, "Catálogo");
+                    TxtEspessura.Text = "---";
+                }
+
+                _hasPendingChanges = false;
+            }
+            finally
+            {
+                _isLoadingProps = false;
             }
         }
 
-        private void LimparCampos()
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TxtDenominacao.Text = TxtNumeroDesenho.Text = TxtCodigo.Text = TxtMaterial.Text = TxtRevisao.Text = "---";
-            TxtProjetista.Text = TxtDataProjeto.Text = TxtEspessura.Text = TxtPeso.Text = "---";
-            TxtNomProjeto.Text = TxtConjunto.Text = TxtAprov.Text = TxtDatAprov.Text = TxtObs.Text = "---";
+            if (_isLoadingProps) return;
+            _hasPendingChanges = true;
         }
 
-        private string GetProp(CustomPropertyManager propMgr, string name)
+        // EVENTO PARA SALVAR AUTOMATICAMENTE AO EDITAR O TEXTO
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            string val = "", res = "";
-            propMgr.Get4(name, false, out val, out res);
+            if (_isLoadingProps) return;
+            TextBox tb = sender as TextBox;
+            if (tb == null || SwApp == null) return;
+
+            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
+            if (swModel == null || tb.Tag == null) return;
+
+            string propName = tb.Tag.ToString();
+            string newValue = tb.Text;
+
+            CustomPropertyManager propMgr = swModel.Extension.get_CustomPropertyManager("");
+            propMgr.Add3(propName, (int)swCustomInfoType_e.swCustomInfoText, newValue, (int)swCustomPropertyAddOption_e.swCustomPropertyReplaceValue);
+        }
+
+        private string ObterValorPorTemplate(ModelDoc2 swModel, string prop, string template)
+        {
+            bool isConfig = false;
+            if (prop == "Número Desenho" && template == "propriedade de peca nova.prtprp") isConfig = true;
+            else if (prop == "Código")
+            {
+                string[] targets = { "05 - catalogo ns", "propriedade de montagem.asmprp", "propriedade de peça nova.prtprp", "propriedade de peça.prtprp" };
+                if (targets.Any(t => template.Contains(t))) isConfig = true;
+            }
+
+            CustomPropertyManager mgr = isConfig ? ((Configuration)swModel.GetActiveConfiguration()).CustomPropertyManager : swModel.Extension.get_CustomPropertyManager("");
+            mgr.Get4(prop, false, out _, out string res);
             return string.IsNullOrWhiteSpace(res) ? "---" : res;
+        }
+
+        private void AjustarVisibilidadeRows(bool isPart, bool isSheetMetal)
+        {
+            RowMaterial.Visibility = isPart ? Visibility.Visible : Visibility.Collapsed;
+            RowEspessura.Visibility = (isPart && isSheetMetal) ? Visibility.Visible : Visibility.Collapsed;
+            RowCatalogo.Visibility = !isPart ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private string GetProp(ModelDoc2 model, string name)
+        {
+            if (model == null) return "---";
+
+            string result = GetPropValue(model.Extension.get_CustomPropertyManager(""), name);
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                Configuration cfg = (Configuration)model.GetActiveConfiguration();
+                result = GetPropValue(cfg?.CustomPropertyManager, name);
+            }
+
+            return string.IsNullOrWhiteSpace(result) ? "---" : result;
+        }
+
+        private string GetPropValue(CustomPropertyManager mgr, string name)
+        {
+            if (mgr == null) return null;
+            mgr.Get4(name, false, out _, out string res);
+            return res;
         }
 
         private void ExecutarMacro(string nome)
@@ -132,7 +256,7 @@ namespace SegundaTaskPane
             else MessageBox.Show("Macro não encontrada: " + nome);
         }
 
-        // Handlers de Macros (Resumidos para brevidade)
+        // Handlers de Macros
         private void BtnMacro01_Click(object sender, RoutedEventArgs e) => ExecutarMacro("01-Cria uma folha de desenho com 3 vistas.swp");
         private void BtnMacro02_Click(object sender, RoutedEventArgs e) => ExecutarMacro("02-Renumerar Folhas de Desenho.swp");
         private void BtnMacro03_Click(object sender, RoutedEventArgs e) => ExecutarMacro("03-Renomear, Criar Cópias e Criar Revisões em Peças e Montagens.swp");
@@ -158,6 +282,76 @@ namespace SegundaTaskPane
         private void BtnTheme_Click(object sender, RoutedEventArgs e)
         {
             _isDarkTheme = !_isDarkTheme;
+            AplicarTema();
+            SalvarConfiguracoes();
+        }
+
+        private void BtnAtualizarProps_Click(object sender, RoutedEventArgs e)
+        {
+            if (SwApp == null) return;
+            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
+            if (swModel == null) return;
+            AtualizarInterface();
+        }
+
+        private void BtnSalvarProps_Click(object sender, RoutedEventArgs e)
+        {
+            if (SwApp == null) return;
+            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
+            if (swModel == null)
+            {
+                LimparCampos();
+                PropriedadesBorder.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            SalvarCamposDigitados(swModel);
+            _hasPendingChanges = false;
+        }
+
+        private void SalvarCamposDigitados(ModelDoc2 swModel)
+        {
+            CustomPropertyManager propMgr = swModel.Extension.get_CustomPropertyManager("");
+
+            TextBox[] campos =
+            {
+                TxtNomProjeto, TxtCodProjeto, TxtDenominacao, TxtNumeroDesenho, TxtCodigo, TxtRevisao,
+                TxtProjetista, TxtDataProjeto, TxtAprov, TxtDatAprov, TxtMaterial, TxtEspessura, TxtCatalogo, TxtObs
+            };
+
+            foreach (var tb in campos)
+            {
+                if (tb?.Tag == null || tb.IsReadOnly) continue;
+                propMgr.Add3(tb.Tag.ToString(), (int)swCustomInfoType_e.swCustomInfoText, tb.Text, (int)swCustomPropertyAddOption_e.swCustomPropertyReplaceValue);
+            }
+        }
+
+        private string GetDocKey(ModelDoc2 model)
+        {
+            if (model == null) return null;
+            string path = model.GetPathName();
+            if (!string.IsNullOrWhiteSpace(path)) return path.ToLowerInvariant();
+            return $"{model.GetTitle()}_{model.GetType()}".ToLowerInvariant();
+        }
+
+        private bool IsSheetMetal(ModelDoc2 model)
+        {
+            if (model == null || model.GetType() != (int)swDocumentTypes_e.swDocPART) return false;
+
+            Feature feat = (Feature)model.FirstFeature();
+            while (feat != null)
+            {
+                string typeName = feat.GetTypeName2();
+                if (typeName == "SheetMetal" || typeName == "SheetMetalFolder")
+                    return true;
+                feat = (Feature)feat.GetNextFeature();
+            }
+
+            return false;
+        }
+
+        private void AplicarTema()
+        {
             SetResource("BgColor", _isDarkTheme ? "#121212" : "#F5F5F5");
             SetResource("CardColor", _isDarkTheme ? "#1E1E1E" : "#FFFFFF");
             SetResource("MainColor", _isDarkTheme ? "#00B4FF" : "#005A9E");
@@ -166,12 +360,45 @@ namespace SegundaTaskPane
             SetResource("BorderColor", _isDarkTheme ? "#333333" : "#CCCCCC");
         }
 
+        private void SalvarConfiguracoes()
+        {
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.CreateSubKey(REG_KEY);
+                key.SetValue("DarkTheme", _isDarkTheme ? 1 : 0);
+                key.Close();
+            }
+            catch { }
+        }
+
+        private void CarregarConfiguracoes()
+        {
+            try
+            {
+                RegistryKey key = Registry.CurrentUser.OpenSubKey(REG_KEY);
+                if (key != null)
+                {
+                    _isDarkTheme = (int)key.GetValue("DarkTheme", 1) == 1;
+                    key.Close();
+                }
+            }
+            catch { _isDarkTheme = true; }
+            AplicarTema();
+        }
+
         private void SetResource(string key, string colorHex) => this.Resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colorHex));
 
         private void BtnExpandir_Click(object sender, RoutedEventArgs e)
         {
             GridExpandido.Visibility = GridExpandido.Visibility == Visibility.Collapsed ? Visibility.Visible : Visibility.Collapsed;
             BtnExpandir.Content = GridExpandido.Visibility == Visibility.Visible ? "▲ RECOLHER" : "▼ MAIS DETALHES";
+        }
+
+        private void LimparCampos()
+        {
+            TxtNomProjeto.Text = TxtCodProjeto.Text = TxtDenominacao.Text = TxtNumeroDesenho.Text = TxtCodigo.Text = TxtRevisao.Text = "---";
+            TxtProjetista.Text = TxtDataProjeto.Text = TxtPeso.Text = "---";
+            TxtAprov.Text = TxtDatAprov.Text = TxtObs.Text = TxtMaterial.Text = TxtEspessura.Text = TxtCatalogo.Text = "---";
         }
     }
 }
