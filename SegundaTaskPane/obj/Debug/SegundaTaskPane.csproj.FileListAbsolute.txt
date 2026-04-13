@@ -16,6 +16,11 @@ C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaT.8415BC42.Up2Date
 C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.dll
 C:\TaskPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.pdb
 C:\1_TaksPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.dll
+C:\1_TaksPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.pdb
+C:\1_TaksPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.tlb
+C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.sldworks.dll
+C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swconst.dll
+C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swpublished.dll
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.AssemblyReference.cache
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\ExportControl.baml
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\MainControl.baml
@@ -24,11 +29,6 @@ C:\1_TaksPane\SegundaTaskPane\obj\Debug\MainControl.g.cs
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane_MarkupCompile.cache
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.g.resources
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.CoreCompileInputs.cache
-C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.sldworks.dll
-C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swconst.dll
-C:\1_TaksPane\SegundaTaskPane\bin\Debug\SolidWorks.Interop.swpublished.dll
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaT.8415BC42.Up2Date
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.dll
 C:\1_TaksPane\SegundaTaskPane\obj\Debug\SegundaTaskPane.pdb
-C:\1_TaksPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.pdb
-C:\1_TaksPane\SegundaTaskPane\bin\Debug\SegundaTaskPane.tlb
