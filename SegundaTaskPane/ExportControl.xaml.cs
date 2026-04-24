@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -24,7 +24,6 @@ namespace SegundaTaskPane
         private readonly string _macroPath = @"Y:\01 PRJ - PROJETO\Projetos\Solid Defaults\Macro SW";
         private const string REG_KEY = @"Software\Potenza\SolidWorksAddin";
         private bool _isLoadingProps = false;
-        private bool _hasPendingChanges = false;
         private string _currentDocKey = null;
         private ModelDoc2 _lastModelRef = null;
         private IntPtr _hwndSource = IntPtr.Zero;
@@ -84,18 +83,18 @@ namespace SegundaTaskPane
                 DetachDocumentEvents();
                 _swDoc = doc;
 
-                if (_swDoc is PartDoc part) part.DestroyNotify += OnDocDestroy;
-                else if (_swDoc is AssemblyDoc assy) assy.DestroyNotify += OnDocDestroy;
-                else if (_swDoc is DrawingDoc draw) draw.DestroyNotify += OnDocDestroy;
+                if (_swDoc is PartDoc part) { part.DestroyNotify += OnDocDestroy; part.NewSelectionNotify += OnSelectionChanged; part.ClearSelectionsNotify += OnSelectionChanged; }
+                else if (_swDoc is AssemblyDoc assy) { assy.DestroyNotify += OnDocDestroy; assy.NewSelectionNotify += OnSelectionChanged; assy.ClearSelectionsNotify += OnSelectionChanged; }
+                else if (_swDoc is DrawingDoc draw) { draw.DestroyNotify += OnDocDestroy; draw.NewSelectionNotify += OnSelectionChanged; draw.ClearSelectionsNotify += OnSelectionChanged; }
             }
         }
 
         private void DetachDocumentEvents()
         {
             if (_swDoc == null) return;
-            if (_swDoc is PartDoc part) part.DestroyNotify -= OnDocDestroy;
-            else if (_swDoc is AssemblyDoc assy) assy.DestroyNotify -= OnDocDestroy;
-            else if (_swDoc is DrawingDoc draw) draw.DestroyNotify -= OnDocDestroy;
+            if (_swDoc is PartDoc part) { part.DestroyNotify -= OnDocDestroy; part.NewSelectionNotify -= OnSelectionChanged; part.ClearSelectionsNotify -= OnSelectionChanged; }
+            else if (_swDoc is AssemblyDoc assy) { assy.DestroyNotify -= OnDocDestroy; assy.NewSelectionNotify -= OnSelectionChanged; assy.ClearSelectionsNotify -= OnSelectionChanged; }
+            else if (_swDoc is DrawingDoc draw) { draw.DestroyNotify -= OnDocDestroy; draw.NewSelectionNotify -= OnSelectionChanged; draw.ClearSelectionsNotify -= OnSelectionChanged; }
             _swDoc = null;
         }
 
@@ -116,6 +115,12 @@ namespace SegundaTaskPane
             return 0;
         }
 
+        private int OnSelectionChanged()
+        {
+            Dispatcher.BeginInvoke(new Action(() => { AtualizarInterface(); }));
+            return 0;
+        }
+
         private int OnDocChange() { AttachDocumentEvents(); AtualizarInterface(); return 0; }
         private int OnFileOpenNotify2(string fileName) { AttachDocumentEvents(); AtualizarInterface(); return 0; }
         private int OnFileNewNotify2(object newDoc, int docType, string templateName) { AttachDocumentEvents(); AtualizarInterface(); return 0; }
@@ -126,7 +131,6 @@ namespace SegundaTaskPane
             _currentDocKey = null;
             _lastModelRef = null;
             _currentTemplate = "";
-            _hasPendingChanges = false;
 
             LimparCampos();
 
@@ -147,13 +151,42 @@ namespace SegundaTaskPane
                 return;
             }
 
-            int type = swModel.GetType();
-            bool isModel = type == (int)swDocumentTypes_e.swDocASSEMBLY || type == (int)swDocumentTypes_e.swDocPART;
-            bool isSheetMetal = type == (int)swDocumentTypes_e.swDocPART && IsSheetMetal(swModel);
+            ModelDoc2 targetModel = swModel;
 
-            _currentDocKey = GetDocKey(swModel);
-            _lastModelRef = swModel;
-            _currentTemplate = swModel.Extension.get_CustomPropertyBuilderTemplate(false);
+            // Lógica de seleção
+            if (swModel.GetType() == (int)swDocumentTypes_e.swDocASSEMBLY || swModel.GetType() == (int)swDocumentTypes_e.swDocDRAWING)
+            {
+                ISelectionMgr selMgr = (ISelectionMgr)swModel.SelectionManager;
+                if (selMgr != null && selMgr.GetSelectedObjectCount2(-1) > 0)
+                {
+                    Component2 comp = (Component2)selMgr.GetSelectedObjectsComponent4(1, -1);
+                    if (comp == null)
+                    {
+                        object selObj = selMgr.GetSelectedObject6(1, -1);
+                        if (selObj != null && selObj is Component2 c)
+                        {
+                            comp = c;
+                        }
+                    }
+
+                    if (comp != null)
+                    {
+                        ModelDoc2 compModel = (ModelDoc2)comp.GetModelDoc2();
+                        if (compModel != null)
+                        {
+                            targetModel = compModel;
+                        }
+                    }
+                }
+            }
+
+            int type = targetModel.GetType();
+            bool isModel = type == (int)swDocumentTypes_e.swDocASSEMBLY || type == (int)swDocumentTypes_e.swDocPART;
+            bool isSheetMetal = type == (int)swDocumentTypes_e.swDocPART && IsSheetMetal(targetModel);
+
+            _currentDocKey = GetDocKey(targetModel);
+            _lastModelRef = targetModel;
+            _currentTemplate = targetModel.Extension.get_CustomPropertyBuilderTemplate(false);
 
             PanelMacrosPeca.Visibility = Visibility.Collapsed;
             PanelMacrosMontagem.Visibility = Visibility.Collapsed;
@@ -162,7 +195,7 @@ namespace SegundaTaskPane
             if (isModel)
             {
                 PropriedadesBorder.Visibility = Visibility.Visible;
-                CarregarPropriedades(swModel, isSheetMetal);
+                CarregarPropriedades(targetModel, isSheetMetal);
 
                 if (type == (int)swDocumentTypes_e.swDocASSEMBLY)
                 {
@@ -218,12 +251,11 @@ namespace SegundaTaskPane
                     TxtCatalogo.Text = GetProp(swModel, "Catálogo");
                     TxtEspessura.Text = "---";
                 }
-                _hasPendingChanges = false;
             }
             finally { _isLoadingProps = false; }
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e) { if (!_isLoadingProps) _hasPendingChanges = true; }
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e) { }
         private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) => EnsureKeyboardFocus(sender as TextBox);
         private void TextBox_PreviewMouseDown(object sender, MouseButtonEventArgs e) => EnsureKeyboardFocus(sender as TextBox);
 
@@ -232,11 +264,11 @@ namespace SegundaTaskPane
             if (_isLoadingProps) return;
             TextBox tb = sender as TextBox;
             if (tb == null || SwApp == null) return;
-            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
-            if (swModel == null || tb.Tag == null) return;
+            ModelDoc2 targetModel = _lastModelRef;
+            if (targetModel == null || tb.Tag == null) return;
 
             string template = !string.IsNullOrEmpty(_currentTemplate) ? Path.GetFileName(_currentTemplate).ToLower() : "";
-            SetProp(swModel, tb.Tag.ToString(), tb.Text, template);
+            SetProp(targetModel, tb.Tag.ToString(), tb.Text, template);
         }
 
         private string ObterValorPorTemplate(ModelDoc2 swModel, string prop, string template)
@@ -307,7 +339,6 @@ namespace SegundaTaskPane
         private void BtnMacro26_Click(object sender, RoutedEventArgs e)
         {
             if (SwApp == null) return;
-            ModelDoc2 swModel = (ModelDoc2)SwApp.ActiveDoc;
             ExecutarMacro("26-Pacote de preenchimento propriedades personalizadas na Peça.swp");
             AtualizarInterface();
         }
@@ -320,7 +351,7 @@ namespace SegundaTaskPane
         private void BtnAtualizarProps_Click(object sender, RoutedEventArgs e) => AtualizarInterface();
         private void BtnSalvarProps_Click(object sender, RoutedEventArgs e)
         {
-            if (SwApp?.ActiveDoc is ModelDoc2 m) { SalvarCamposDigitados(m); _hasPendingChanges = false; }
+            if (_lastModelRef != null) { SalvarCamposDigitados(_lastModelRef); }
         }
 
         private void SalvarCamposDigitados(ModelDoc2 swModel)

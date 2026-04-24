@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Integration;
 using Microsoft.Win32;
@@ -14,7 +14,6 @@ namespace SegundaTaskPane
         private ISldWorks _swApp;
         private int _cookie;
         private TaskpaneView _taskPane1;
-        private TaskpaneView _taskPane2;
         public bool ConnectToSW(object ThisSW, int Cookie)
         {
             _swApp = (ISldWorks)ThisSW;
@@ -22,17 +21,10 @@ namespace SegundaTaskPane
 
             try
             {
-                // ABA 1 - MainControl
                 _taskPane1 = _swApp.CreateTaskpaneView2(string.Empty, "Comandos SW");
-                var ui1 = new MainControl { SwApp = _swApp };
+                var ui1 = new ExportControl { SwApp = _swApp };
                 var host1 = new ElementHost { Child = ui1 };
                 _taskPane1.DisplayWindowFromHandlex64(host1.Handle.ToInt64());
-
-                // ABA 2 - ExportControl (ADICIONE ESTE BLOCO)
-                _taskPane2 = _swApp.CreateTaskpaneView2(string.Empty, "Exportar Arquivos");
-                var ui2 = new ExportControl { SwApp = _swApp }; // Certifique-se que ExportControl tem a propriedade SwApp
-                var host2 = new ElementHost { Child = ui2 };
-                _taskPane2.DisplayWindowFromHandlex64(host2.Handle.ToInt64());
             }
             catch (Exception ex)
             {
