@@ -44,3 +44,15 @@ C:\Aplicacoes Python\Macro 18\Antigravity\EstudoTaskPane\TaskPaneV1\SegundaTaskP
 C:\Aplicacoes Python\Macro 18\Antigravity\EstudoTaskPane\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaT.8415BC42.Up2Date
 C:\Aplicacoes Python\Macro 18\Antigravity\EstudoTaskPane\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.dll
 C:\Aplicacoes Python\Macro 18\Antigravity\EstudoTaskPane\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.pdb
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\bin\Debug\SegundaTaskPane.dll
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\bin\Debug\SegundaTaskPane.pdb
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\bin\Debug\SegundaTaskPane.tlb
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.AssemblyReference.cache
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\ExportControl.baml
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\ExportControl.g.cs
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane_MarkupCompile.cache
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.g.resources
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.csproj.CoreCompileInputs.cache
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaT.8415BC42.Up2Date
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.dll
+C:\Users\admin\Documents\TaskPaneV1\SegundaTaskPane\obj\Debug\SegundaTaskPane.pdb
