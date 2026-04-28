@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -154,30 +155,42 @@ namespace SegundaTaskPane
             ModelDoc2 targetModel = swModel;
 
             // Lógica de seleção
-            if (swModel.GetType() == (int)swDocumentTypes_e.swDocASSEMBLY || swModel.GetType() == (int)swDocumentTypes_e.swDocDRAWING)
+            // Importante: não chamar APIs de Assembly (ex.: GetSelectedObjectsComponent4) quando o doc ativo é Drawing,
+            // pois ao clicar em vistas no ambiente de desenho isso pode causar crash do SolidWorks.
+            int activeDocType;
+            try { activeDocType = swModel.GetType(); }
+            catch { return; }
+
+            ISelectionMgr selMgr = null;
+            try { selMgr = (ISelectionMgr)swModel.SelectionManager; }
+            catch { selMgr = null; }
+
+            if (selMgr != null && selMgr.GetSelectedObjectCount2(-1) > 0)
             {
-                ISelectionMgr selMgr = (ISelectionMgr)swModel.SelectionManager;
-                if (selMgr != null && selMgr.GetSelectedObjectCount2(-1) > 0)
+                if (activeDocType == (int)swDocumentTypes_e.swDocASSEMBLY)
                 {
-                    Component2 comp = (Component2)selMgr.GetSelectedObjectsComponent4(1, -1);
-                    if (comp == null)
+                    try
                     {
-                        object selObj = selMgr.GetSelectedObject6(1, -1);
-                        if (selObj != null && selObj is Component2 c)
+                        Component2 comp = (Component2)selMgr.GetSelectedObjectsComponent4(1, -1);
+                        if (comp == null)
                         {
-                            comp = c;
+                            object selObj = selMgr.GetSelectedObject6(1, -1);
+                            if (selObj is Component2 c) comp = c;
+                        }
+
+                        if (comp != null)
+                        {
+                            ModelDoc2 compModel = (ModelDoc2)comp.GetModelDoc2();
+                            if (compModel != null) targetModel = compModel;
                         }
                     }
-
-                    if (comp != null)
+                    catch (COMException)
                     {
-                        ModelDoc2 compModel = (ModelDoc2)comp.GetModelDoc2();
-                        if (compModel != null)
-                        {
-                            targetModel = compModel;
-                        }
+                        System.Diagnostics.Debug.WriteLine("Seleção (Assembly) falhou ao resolver componente selecionado.");
                     }
                 }
+                // Em Drawing: manter o documento ativo como Drawing.
+                // Mesmo se a seleÃ§Ã£o for uma vista/componente, nÃ£o trocar a UI para PeÃ§a/Montagem.
             }
 
             int type = targetModel.GetType();
@@ -216,6 +229,56 @@ namespace SegundaTaskPane
                 PanelMacrosDesenho.Visibility = Visibility.Visible;
                 LblTituloMacros.Text = "MACROS - DESENHO";
             }
+        }
+
+        private ModelDoc2 TryGetSelectedModelFromDrawing(ISelectionMgr selMgr)
+        {
+            if (selMgr == null) return null;
+
+            try
+            {
+                int count = selMgr.GetSelectedObjectCount2(-1);
+                for (int i = 1; i <= count; i++)
+                {
+                    object selObj;
+                    try { selObj = selMgr.GetSelectedObject6(i, -1); }
+                    catch (COMException) { continue; }
+
+                    if (selObj is Component2 comp)
+                    {
+                        ModelDoc2 compModel = (ModelDoc2)comp.GetModelDoc2();
+                        if (compModel != null) return compModel;
+                    }
+
+                    if (selObj is DrawingComponent drawComp)
+                    {
+                        Component2 drawingComponent = null;
+                        try { drawingComponent = (Component2)drawComp.Component; }
+                        catch (COMException) { drawingComponent = null; }
+
+                        if (drawingComponent != null)
+                        {
+                            ModelDoc2 drawingModel = (ModelDoc2)drawingComponent.GetModelDoc2();
+                            if (drawingModel != null) return drawingModel;
+                        }
+                    }
+
+                    if (selObj is View view)
+                    {
+                        object refDoc;
+                        try { refDoc = view.ReferencedDocument; }
+                        catch (COMException) { continue; }
+
+                        if (refDoc is ModelDoc2 refModel) return refModel;
+                    }
+                }
+            }
+            catch (COMException)
+            {
+                System.Diagnostics.Debug.WriteLine("Seleção (Drawing) falhou ao resolver documento referenciado.");
+            }
+
+            return null;
         }
 
         private void CarregarPropriedades(ModelDoc2 swModel, bool isSheetMetal)
@@ -325,7 +388,7 @@ namespace SegundaTaskPane
         private void BtnMacro03_Click(object sender, RoutedEventArgs e) => ExecutarMacro("03-Renomear, Criar Cópias e Criar Revisões em Peças e Montagens.swp");
         private void BtnMacro04_Click(object sender, RoutedEventArgs e) => ExecutarMacro("04-Salva PDFs de uma Montagem-ERP.swp");
         private void BtnMacro05_Click(object sender, RoutedEventArgs e) => ExecutarMacro("05-Impressao Automatica de Desenhos.swp");
-        private void BtnMacro06_Click(object sender, RoutedEventArgs e) => ExecutarMacro("06-Soldagem 3D.swp");
+        private void BtnMacro06_Click(object sender, RoutedEventArgs e) => ExecutarMacro("06-Solda por Varredura.swp");
         private void BtnMacro07_Click(object sender, RoutedEventArgs e) => ExecutarMacro("07-Lista de Chapas DXF QTY.swp");
         private void BtnMacro13_Click(object sender, RoutedEventArgs e) => ExecutarMacro("13-Salva em PDF - ERP - CIGAM.swp");
         private void BtnMacro14_Click(object sender, RoutedEventArgs e) => ExecutarMacro("14-Navegador catalogos.swp");

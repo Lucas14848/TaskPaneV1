@@ -58,6 +58,46 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="FooterButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="{DynamicResource BtnBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BtnText}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock x:Name="icon" Text="{TemplateBinding Tag}" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource MainColor}"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource MainColor}"/>
+                                <Setter TargetName="icon" Property="Foreground" Value="{DynamicResource BtnBg}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource BtnBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="{DynamicResource BgColor}">
@@ -188,14 +228,13 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Border Grid.Row="1" Background="{DynamicResource CardColor}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,1,0,0" Padding="5">
-            <StackPanel Orientation="Vertical">
-                <Button x:Name="BtnSalvarProps" Content="SALVAR AGORA" Height="22" Width="110" HorizontalAlignment="Left"
-                        Background="{DynamicResource BtnBg}" Foreground="{DynamicResource MainColor}"
-                        BorderThickness="1" BorderBrush="{DynamicResource BorderColor}"
-                        FontWeight="Bold" FontSize="9" Margin="0,0,0,4" Click="BtnSalvarProps_Click" Cursor="Hand"/>
+        <Border Grid.Row="1" Background="{DynamicResource CardColor}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,1,0,0" Padding="10">
+            <UniformGrid Columns="3" Rows="1">
+                <Button x:Name="BtnSalvarProps" Content="Salvar" Tag="&#xE74E;" Style="{StaticResource FooterButtonStyle}" Click="BtnSalvarProps_Click"/>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" >
+                <Button x:Name="BtnAtualizarProps" Content="Atualizar" Tag="&#xE72C;" Style="{StaticResource FooterButtonStyle}" Click="BtnAtualizarProps_Click"/>
+                <Button x:Name="BtnTheme" Content="Tema" Tag="&#xE706;" Style="{StaticResource FooterButtonStyle}" Click="BtnTheme_Click"/>
+                <!--
                     <Button x:Name="BtnAtualizarProps" Content="ATUALIZAR PROPS" Height="30" Width="Auto" Margin="0,0,5,0"
                             Background="{DynamicResource BtnBg}" Foreground="{DynamicResource MainColor}"
                             BorderThickness="1" BorderBrush="{DynamicResource BorderColor}"
@@ -212,7 +251,8 @@
                         </Button.Resources>
                     </Button>
                 </StackPanel>
-            </StackPanel>
+                -->
+            </UniformGrid>
         </Border>
     </Grid>
 </UserControl>
